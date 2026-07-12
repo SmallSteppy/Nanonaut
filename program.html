@@ -19,6 +19,9 @@
 
         var NANONAUT_SKOK_RYCHLOST = 20;
 
+        var NANONAUT_X_RYCHLOST = 5;
+        var POZADI_WIDTH = 1000;
+
         //Nastavení
         var canvas = document.createElement('canvas');
         var c = canvas.getContext('2d');
@@ -32,13 +35,16 @@
         var pozadiImage = new Image ();
         pozadiImage.src = 'program/background.png';
 
-        var nanonautX = 50;
-        var nanonautY = 40;
+        var nanonautX = CANVAS_WIDTH / 2;
+        var nanonautY = ZEME_Y - NANONAUT_HEIGHT;
 
         var nanonautYRychlost = 0;
         var nanonautVeVzduchu = false;
 
         var mezernikStisknuty = false;
+
+        var kameraX = 0;
+        var kameraY = 0;
 
         window.addEventListener('keydown', dolu);
         window.addEventListener('keyup', nahoru);
@@ -71,6 +77,7 @@
 
         //Aktualizace
         function update (){
+            nanonautX = nanonautX + NANONAUT_X_RYCHLOST;
             if(mezernikStisknuty && !nanonautVeVzduchu){
                 nanonautYRychlost = -NANONAUT_SKOK_RYCHLOST;
                 nanonautVeVzduchu = true;
@@ -86,6 +93,9 @@
                 nanonautYRychlost = 0;
                 nanonautVeVzduchu = false;
             }
+
+            //aktualizace kamery
+            kameraX = nanonautX - 150;
         }
 
         //Zobrazení
@@ -96,14 +106,17 @@
             c.fillRect (0, 0, CANVAS_WIDTH, ZEME_Y - 40);
 
             //Zobrazení pozadí
-            c.drawImage(pozadiImage, 0, -210);
+            var pozadiX = -(kameraX % POZADI_WIDTH); 
+            c.drawImage(pozadiImage, pozadiX, -210);
+            c.drawImage(pozadiImage, pozadiX + POZADI_WIDTH, -210);
+
 
             // ZOBRAZENÍ ZEMĚ
             c.fillStyle = 'ForestGreen';
             c.fillRect (0, ZEME_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - ZEME_Y + 40);
 
             // ZOBRAZENÍ NANONAUTA
-            c.drawImage (nanonautImage, nanonautX, nanonautY);
+            c.drawImage (nanonautImage, nanonautX - kameraX, nanonautY - kameraY);
         }
         
     </script>
