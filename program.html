@@ -22,6 +22,10 @@
         var NANONAUT_X_RYCHLOST = 5;
         var POZADI_WIDTH = 1000;
 
+        var NANONAUT_POCET_SNIMKU_V_RADE = 5;
+        var NANONAUT_POCET_SNIMKU_ANIMACE = 7;
+        var NANONAUT_ANIMACE_RYCHLOST = 5;
+
         //Nastavení
         var canvas = document.createElement('canvas');
         var c = canvas.getContext('2d');
@@ -30,7 +34,7 @@
         document.body.appendChild(canvas);
 
         var nanonautImage = new Image ();
-        nanonautImage.src = 'program/Nanonaut.png';
+        nanonautImage.src = 'program/animatedNanonaut.png';
 
         var pozadiImage = new Image ();
         pozadiImage.src = 'program/background.png';
@@ -42,6 +46,8 @@
         var nanonautVeVzduchu = false;
 
         var mezernikStisknuty = false;
+        var nanonautSnimekNr = 0;
+        var hraSnimkyPocitadlo = 0;
 
         var kameraX = 0;
         var kameraY = 0;
@@ -77,6 +83,7 @@
 
         //Aktualizace
         function update (){
+            hraSnimkyPocitadlo = hraSnimkyPocitadlo + 1;
             nanonautX = nanonautX + NANONAUT_X_RYCHLOST;
             if(mezernikStisknuty && !nanonautVeVzduchu){
                 nanonautYRychlost = -NANONAUT_SKOK_RYCHLOST;
@@ -93,6 +100,14 @@
                 nanonautYRychlost = 0;
                 nanonautVeVzduchu = false;
             }
+
+            // aktualizace animace
+            if ((hraSnimkyPocitadlo % NANONAUT_ANIMACE_RYCHLOST) === 0) {
+                nanonautSnimekNr = nanonautSnimekNr + 1;
+                if (nanonautSnimekNr >= NANONAUT_POCET_SNIMKU_ANIMACE) {
+                    nanonautSnimekNr = 0;
+                }
+            }   
 
             //aktualizace kamery
             kameraX = nanonautX - 150;
@@ -116,7 +131,11 @@
             c.fillRect (0, ZEME_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - ZEME_Y + 40);
 
             // ZOBRAZENÍ NANONAUTA
-            c.drawImage (nanonautImage, nanonautX - kameraX, nanonautY - kameraY);
+            var nanonautSpriteSheetRada = Math.floor(nanonautSnimekNr / NANONAUT_POCET_SNIMKU_V_RADE);
+            var nanonautSpriteSheetSloupec = nanonautSnimekNr % NANONAUT_POCET_SNIMKU_V_RADE;
+            var nanonautSpriteSheetX = nanonautSpriteSheetSloupec * NANONAUT_WIDTH;
+            var nanonautSpriteSheetY = nanonautSpriteSheetRada * NANONAUT_HEIGHT;
+            c.drawImage (nanonautImage, nanonautSpriteSheetX, nanonautSpriteSheetY, NANONAUT_WIDTH, NANONAUT_HEIGHT, nanonautX - kameraX, nanonautY - kameraY, NANONAUT_WIDTH, NANONAUT_HEIGHT);
         }
         
     </script>
