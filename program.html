@@ -39,6 +39,12 @@
         var pozadiImage = new Image ();
         pozadiImage.src = 'program/background.png';
 
+        var ker1Image= new Image ();
+        ker1Image.src = 'program/bush1.png';
+
+        var ker2Image= new Image ();
+        ker2Image.src = 'program/bush2.png';
+
         var nanonautX = CANVAS_WIDTH / 2;
         var nanonautY = ZEME_Y - NANONAUT_HEIGHT;
 
@@ -52,6 +58,8 @@
         var kameraX = 0;
         var kameraY = 0;
 
+        var kerData = generovaniKeru();
+
         window.addEventListener('keydown', dolu);
         window.addEventListener('keyup', nahoru);
         
@@ -61,6 +69,27 @@
         window.requestAnimationFrame(mainLoop);
         }
 
+        function generovaniKeru() {
+            var dataGenerovanychKeru = [];
+            var kerX = 0;
+            while (kerX < (2 * CANVAS_WIDTH)) {
+                var kerImage;
+                if(Math.random() >= 0.5){
+                    kerImage = ker1Image;
+                }
+                else{
+                    kerImage = ker2Image;
+                }
+
+                dataGenerovanychKeru.push({
+                    x: kerX,
+                    y: 80 + Math.random() * 20,
+                    image: kerImage
+                });
+                kerX += 150 + Math.random() * 200;
+            }
+            return dataGenerovanychKeru;
+        }
 
         //Hlavní smyčka
         function mainLoop () {
@@ -111,6 +140,13 @@
 
             //aktualizace kamery
             kameraX = nanonautX - 150;
+
+            //aktualizace keřů
+            for (var i = 0; i<kerData.length; i++) {
+                if ((kerData[i].x - kameraX) < -CANVAS_WIDTH) {
+                    kerData[i].x += (2 * CANVAS_WIDTH) + 150;
+                }
+            }
         }
 
         //Zobrazení
@@ -129,6 +165,11 @@
             // ZOBRAZENÍ ZEMĚ
             c.fillStyle = 'ForestGreen';
             c.fillRect (0, ZEME_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - ZEME_Y + 40);
+
+            //Zobrazení keřů
+            for (var i=0; i < kerData.length; i++) {
+            c.drawImage(kerData[i].image, kerData[i].x - kameraX,ZEME_Y - kerData[i].y - kameraY);
+            }
 
             // ZOBRAZENÍ NANONAUTA
             var nanonautSpriteSheetRada = Math.floor(nanonautSnimekNr / NANONAUT_POCET_SNIMKU_V_RADE);
