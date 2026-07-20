@@ -22,9 +22,11 @@
         var NANONAUT_X_RYCHLOST = 5;
         var POZADI_WIDTH = 1000;
 
-        var NANONAUT_POCET_SNIMKU_V_RADE = 5;
         var NANONAUT_POCET_SNIMKU_ANIMACE = 7;
         var NANONAUT_ANIMACE_RYCHLOST = 5;
+
+        var ROBOT_WIDTH = 141;
+        var ROBOT_HEIGHT = 139;
 
         //Nastavení
         var canvas = document.createElement('canvas');
@@ -45,6 +47,9 @@
         var ker2Image= new Image ();
         ker2Image.src = 'program/bush2.png';
 
+        var robotImage= new Image ();
+        robotImage.src = 'program/animatedRobot.png';
+
         var nanonautX = CANVAS_WIDTH / 2;
         var nanonautY = ZEME_Y - NANONAUT_HEIGHT;
 
@@ -59,6 +64,28 @@
         var kameraY = 0;
 
         var kerData = generovaniKeru();
+
+        //objekt nanonauta
+        var nanonautSpriteSheet = {
+            pocetSnimkuVRade: 5,
+            spriteWidth: NANONAUT_WIDTH,
+            spriteHeight: NANONAUT_HEIGHT,
+            image: nanonautImage
+        };
+
+        //objekt robota
+        var robotSpriteSheet = {
+            pocetSnimkuVRade: 3,
+            spriteWidth: ROBOT_WIDTH,
+            spriteHeight: ROBOT_HEIGHT,
+            image: robotImage
+        };
+
+        var robotData = [{
+            x: 400,
+            y: ZEME_Y - ROBOT_HEIGHT,
+            snimekNr: 0
+        }];
 
         window.addEventListener('keydown', dolu);
         window.addEventListener('keyup', nahoru);
@@ -171,12 +198,30 @@
             c.drawImage(kerData[i].image, kerData[i].x - kameraX,ZEME_Y - kerData[i].y - kameraY);
             }
 
+            //zobrazení robotů
+            for (var i= 0; i < robotData.length; i++) {
+                zobrazAnimovanySprite (robotData[i].x - kameraX,
+                robotData[i].y - kameraY, robotData[i].snimekNr, robotSpriteSheet);
+            }            
+            
             // ZOBRAZENÍ NANONAUTA
-            var nanonautSpriteSheetRada = Math.floor(nanonautSnimekNr / NANONAUT_POCET_SNIMKU_V_RADE);
-            var nanonautSpriteSheetSloupec = nanonautSnimekNr % NANONAUT_POCET_SNIMKU_V_RADE;
-            var nanonautSpriteSheetX = nanonautSpriteSheetSloupec * NANONAUT_WIDTH;
-            var nanonautSpriteSheetY = nanonautSpriteSheetRada * NANONAUT_HEIGHT;
-            c.drawImage (nanonautImage, nanonautSpriteSheetX, nanonautSpriteSheetY, NANONAUT_WIDTH, NANONAUT_HEIGHT, nanonautX - kameraX, nanonautY - kameraY, NANONAUT_WIDTH, NANONAUT_HEIGHT);
+            zobrazAnimovanySprite (nanonautX - kameraX, nanonautY - kameraY,
+            nanonautSnimekNr, nanonautSpriteSheet);
+        
+            //zobrazení animovaneho spritu
+            function zobrazAnimovanySprite (screenX, screenY, snimekNr, spriteSheet) {
+                var SpriteSheetRada = Math.floor (snimekNr / spriteSheet.pocetSnimkuVRade);
+                var spriteSheetSloupec = snimekNr % spriteSheet.pocetSnimkuVRade;
+                var spriteSheetX = spriteSheetSloupec * spriteSheet.spriteWidth;
+                var spriteSheetY = SpriteSheetRada * spriteSheet.spriteHeight;
+                c.drawImage (
+                spriteSheet.image,
+                spriteSheetX, spriteSheetY,
+                spriteSheet.spriteWidth, spriteSheet.spriteHeight, screenX, screenY,
+                spriteSheet.spriteWidth, spriteSheet.spriteHeight
+                );
+            }
+
         }
         
     </script>
