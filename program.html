@@ -89,6 +89,20 @@
             image: robotImage
         };
 
+        var nanonautKolizniOndelnik = {
+            xOffset: 60,
+            yOffset: 20,
+            width: 50,
+            height: 200
+        };
+
+        var robotKolizniObdelnik = {
+            xOffset: 50,
+            yOffset: 20,
+            width: 50,
+            height: 100
+        };
+
         var robotData = [];
 
         window.addEventListener('keydown', dolu);
@@ -186,6 +200,13 @@
         function updateRoboti() {
             //pohyb a animace robotů
             for (var i = 0; i < robotData.length; i++) {
+                if (PrekryvaRobotNanonauta(nanonautX + nanonautKolizniOndelnik.xOffset, nanonautY + nanonautKolizniOndelnik.yOffset, nanonautKolizniOndelnik.width, nanonautKolizniOndelnik.height,
+                    robotData[i].x + robotKolizniObdelnik.xOffset,
+                    robotData[i].y + robotKolizniObdelnik.yOffset,
+                    robotKolizniObdelnik.width,
+                    robotKolizniObdelnik.height)) {
+                    console.log("AU!");
+                }
                 robotData[i].x -= ROBOT_X_RYCHLOST;
                 if ((hraSnimkyPocitadlo % ROBOT_ANIMACE_RYCHLOST) === 0) {
                     robotData[i].snimekNr = robotData[i].snimekNr + 1;
@@ -216,6 +237,19 @@
                     snimekNr: 0
                 });
             }
+        }
+
+        function PrekryvaRobotOkrajNanonauta(nanonautBlizkoX, nanonautDalekoX, robotBlizkoX, robotDalekoX) {
+            var NanonautPrekryvaBlizky = (nanonautDalekoX >=robotBlizkoX) && (nanonautDalekoX <= robotDalekoX);
+            var NanonautPrekryvaDaleky = (nanonautBlizkoX >= robotBlizkoX) && (nanonautBlizkoX <= robotDalekoX);
+            var NanonautPrekryvaCelehoRobota = (nanonautBlizkoX <= robotBlizkoX) && (nanonautDalekoX >= robotDalekoX);
+            return NanonautPrekryvaBlizky || NanonautPrekryvaDaleky || NanonautPrekryvaCelehoRobota;
+        }
+
+        function PrekryvaRobotNanonauta(nanonautX, nanonautY, nanonautWidth, nanonautHeight, robotX, robotY, robotWidth, robotHeight) {
+            var nanonautPrekryvaRobotaOsaX = PrekryvaRobotOkrajNanonauta(nanonautX, nanonautX + nanonautWidth, robotX, robotX + robotWidth);
+            var nanonautPrekryvaRobotaOsaY = PrekryvaRobotOkrajNanonauta(nanonautY, nanonautY + nanonautHeight, robotY, robotY + robotHeight);
+            return nanonautPrekryvaRobotaOsaX && nanonautPrekryvaRobotaOsaY;
         }
 
         //Zobrazení
