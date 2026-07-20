@@ -23,10 +23,14 @@
         var POZADI_WIDTH = 1000;
 
         var NANONAUT_POCET_SNIMKU_ANIMACE = 7;
-        var NANONAUT_ANIMACE_RYCHLOST = 5;
+        var NANONAUT_ANIMACE_RYCHLOST = 3;
 
         var ROBOT_WIDTH = 141;
         var ROBOT_HEIGHT = 139;
+
+        var ROBOT_POCET_SNIMKU_ANIMACE = 9;
+        var ROBOT_ANIMACE_RYCHLOST = 5;
+        var ROBOT_X_RYCHLOST = 4;
 
         //Nastavení
         var canvas = document.createElement('canvas');
@@ -172,6 +176,22 @@
             for (var i = 0; i<kerData.length; i++) {
                 if ((kerData[i].x - kameraX) < -CANVAS_WIDTH) {
                     kerData[i].x += (2 * CANVAS_WIDTH) + 150;
+                }
+            }
+
+            //aktualizace robotů
+            updateRoboti();
+        }
+
+        function updateRoboti() {
+            //pohyb a animace robotů
+            for (var i = 0; i < robotData.length; i++) {
+                robotData[i].x -= ROBOT_X_RYCHLOST;
+                if ((hraSnimkyPocitadlo % ROBOT_ANIMACE_RYCHLOST) === 0) {
+                    robotData[i].snimekNr = robotData[i].snimekNr + 1;
+                    if (robotData[i].snimekNr >= ROBOT_POCET_SNIMKU_ANIMACE) {
+                        robotData[i].snimekNr = 0;
+                    }
                 }
             }
         }
