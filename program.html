@@ -32,6 +32,10 @@
         var ROBOT_ANIMACE_RYCHLOST = 5;
         var ROBOT_X_RYCHLOST = 4;
 
+        var MIN_VZDALENOST_MEZI_ROBOTY = 400;
+        var MAX_VZDALENOST_MEZI_ROBOTY = 1200;
+        var MAX_AKTIVNICH_ROBOTU = 3;
+
         //Nastavení
         var canvas = document.createElement('canvas');
         var c = canvas.getContext('2d');
@@ -85,11 +89,7 @@
             image: robotImage
         };
 
-        var robotData = [{
-            x: 400,
-            y: ZEME_Y - ROBOT_HEIGHT,
-            snimekNr: 0
-        }];
+        var robotData = [];
 
         window.addEventListener('keydown', dolu);
         window.addEventListener('keyup', nahoru);
@@ -193,6 +193,28 @@
                         robotData[i].snimekNr = 0;
                     }
                 }
+            }
+            //odstranění robotů, kteří jsou mimo obrazovku
+            var robotIndex = 0;
+            while (robotIndex < robotData.length) {
+                if (robotData[robotIndex].x < kameraX-ROBOT_WIDTH) {
+                    robotData.splice(robotIndex, 1);
+                    console.log("Odstranil jsem robota!");
+                } else {
+                    robotIndex++;
+                }
+            }
+            if (robotData.length < MAX_AKTIVNICH_ROBOTU) {
+                var posledniRobotX = CANVAS_WIDTH;
+                if (robotData.length > 0) {
+                    posledniRobotX = robotData[robotData.length - 1].x;
+                }
+                var novyRobotX = posledniRobotX + MIN_VZDALENOST_MEZI_ROBOTY + Math.random() * (MAX_VZDALENOST_MEZI_ROBOTY - MIN_VZDALENOST_MEZI_ROBOTY);
+                robotData.push({
+                    x: novyRobotX,
+                    y: ZEME_Y - ROBOT_HEIGHT,
+                    snimekNr: 0
+                });
             }
         }
 
