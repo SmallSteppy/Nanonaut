@@ -36,6 +36,9 @@
         var MAX_VZDALENOST_MEZI_ROBOTY = 1200;
         var MAX_AKTIVNICH_ROBOTU = 3;
 
+        var ZATRESENI_RADIUS = 16;
+        var NANONAUT_MAX_ZDRAVI = 100;
+
         //Nastavení
         var canvas = document.createElement('canvas');
         var c = canvas.getContext('2d');
@@ -70,6 +73,10 @@
 
         var kameraX = 0;
         var kameraY = 0;
+
+        var zatreseni = false;
+
+        var nanonautZdravi = NANONAUT_MAX_ZDRAVI;
 
         var kerData = generovaniKeru();
 
@@ -194,18 +201,26 @@
             }
 
             //aktualizace robotů
-            updateRoboti();
+            zatreseni = false;
+            var nanonautRobotDotek = updateRoboti();
+            if (nanonautRobotDotek) {
+                zatreseni = true;
+                if(nanonautZdravi > 0){
+                    nanonautZdravi -= 1;
+                }
+            }
         }
 
         function updateRoboti() {
-            //pohyb a animace robotů
+            //pohyb a animace robotů a kotrola kolize s nanonautem
+            var nanonautRobotDotek = false;
             for (var i = 0; i < robotData.length; i++) {
                 if (PrekryvaRobotNanonauta(nanonautX + nanonautKolizniOndelnik.xOffset, nanonautY + nanonautKolizniOndelnik.yOffset, nanonautKolizniOndelnik.width, nanonautKolizniOndelnik.height,
                     robotData[i].x + robotKolizniObdelnik.xOffset,
                     robotData[i].y + robotKolizniObdelnik.yOffset,
                     robotKolizniObdelnik.width,
                     robotKolizniObdelnik.height)) {
-                    console.log("AU!");
+                    nanonautRobotDotek = true;
                 }
                 robotData[i].x -= ROBOT_X_RYCHLOST;
                 if ((hraSnimkyPocitadlo % ROBOT_ANIMACE_RYCHLOST) === 0) {
@@ -237,6 +252,7 @@
                     snimekNr: 0
                 });
             }
+            return nanonautRobotDotek;
         }
 
         function PrekryvaRobotOkrajNanonauta(nanonautBlizkoX, nanonautDalekoX, robotBlizkoX, robotDalekoX) {
@@ -255,6 +271,13 @@
         //Zobrazení
         function draw (){
 
+            var otresKameraX = kameraX;
+            var otresKameraY = kameraY;
+            if (zatreseni) {
+                otresKameraX += (Math.random() - 0.5) * ZATRESENI_RADIUS;
+                otresKameraY += (Math.random() - 0.5) * ZATRESENI_RADIUS;
+            }
+
             //ZOBRAZENÍ OBLOHY 
             c.fillStyle = 'LightSkyBlue';
             c.fillRect (0, 0, CANVAS_WIDTH, ZEME_Y - 40);
@@ -271,7 +294,7 @@
 
             //Zobrazení keřů
             for (var i=0; i < kerData.length; i++) {
-            c.drawImage(kerData[i].image, kerData[i].x - kameraX,ZEME_Y - kerData[i].y - kameraY);
+            c.drawImage(kerData[i].image, kerData[i].x - otresKameraX ,ZEME_Y - kerData[i].y - otresKameraY);
             }
 
             //zobrazení robotů
@@ -283,6 +306,12 @@
             // ZOBRAZENÍ NANONAUTA
             zobrazAnimovanySprite (nanonautX - kameraX, nanonautY - kameraY,
             nanonautSnimekNr, nanonautSpriteSheet);
+
+            //Zobrazení ukazatele zdraví
+            c.fillStyle = 'red';
+            c.fillRect(400, 10, nanonautZdravi / NANONAUT_MAX_ZDRAVI * 380, 20);
+            c.strokeStyle = 'red';
+            c.strokeRect(400, 10, 380, 20);
         
             //zobrazení animovaneho spritu
             function zobrazAnimovanySprite (screenX, screenY, snimekNr, spriteSheet) {
